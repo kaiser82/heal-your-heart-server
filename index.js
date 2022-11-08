@@ -14,9 +14,50 @@ const port = process.env.port || 5000
 
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.pyz6p0u.mongodb.net/?retryWrites=true&w=majority`;
-console.log(uri)
+// console.log(uri)
 
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
+
+
+async function run() {
+    try {
+
+        const serviceCollection = client.db('healYourHeart').collection('services');
+        const reviewCollection = client.db('healYourHeart').collection('reviews');
+
+
+        app.get('/services', async (req, res) => {
+            const query = {};
+            const cursor = serviceCollection.find(query);
+            const services = await cursor.toArray();
+            res.send(services);
+        });
+
+        app.get('/details/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const detail = await serviceCollection.findOne(query);
+            res.send(detail);
+        });
+
+        app.post('/reviews', async (req, res) => {
+            const review = req.body;
+            const result = await reviewCollection.insertOne(review);
+            res.send(result);
+        });
+
+    }
+
+    finally {
+
+    }
+}
+run().catch(err => console.log(err));
+
+
+
+
+
 
 
 app.get('/', (req, res) => {
