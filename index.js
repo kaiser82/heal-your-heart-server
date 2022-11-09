@@ -10,7 +10,7 @@ app.use(cors());
 app.use(express.json());
 
 
-const port = process.env.port || 5000
+const port = process.env.PORT || 5000
 
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.pyz6p0u.mongodb.net/?retryWrites=true&w=majority`;
@@ -44,6 +44,13 @@ async function run() {
             const review = req.body;
             const result = await reviewCollection.insertOne(review);
             res.send(result);
+        });
+
+        app.get('/reviews', async (req, res) => {
+            const query = {};
+            const cursor = reviewCollection.find(query);
+            const reviews = await cursor.toArray();
+            res.send(reviews);
         });
 
     }
