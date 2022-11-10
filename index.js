@@ -24,6 +24,7 @@ async function run() {
 
         const serviceCollection = client.db('healYourHeart').collection('services');
         const reviewCollection = client.db('healYourHeart').collection('reviews');
+        const myServiceCollection = client.db('healYourHeart').collection('myServices');
 
 
         app.get('/services', async (req, res) => {
@@ -78,6 +79,26 @@ async function run() {
             const query = { _id: ObjectId(id) };
             const result = await reviewCollection.deleteOne(query);
             res.send(result);
+        });
+
+        // my added services
+        app.post('/myServices', async (req, res) => {
+            const service = req.body;
+            const result = await myServiceCollection.insertOne(service);
+            res.send(result);
+        });
+
+        app.get('/myServices', async (req, res) => {
+            let query = {};
+            if (req.query.email) {
+                query = {
+                    email: req.query.email
+                }
+            }
+
+            const cursor = myServiceCollection.find(query);
+            const myServices = await cursor.toArray();
+            res.send(myServices);
         });
 
     }
